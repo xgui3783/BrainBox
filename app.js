@@ -148,6 +148,32 @@ db.get('user').findOne({nickname: 'anyone'})
     }
   });
 
+//====
+// Experimental nehuba viewer
+//====
+if (Config && Config.experimental && Config.experimental.useNehuba) {
+  tracer.log(`[experimental] nehuba viewer enabled`)
+  let mainJs, chunkWorkerJs
+  try {
+    mainJs = fs.readFileSync(path.join(__dirname, './node_modules/export-nehuba/dist/min/main.bundle.js'), 'utf-8')
+    chunkWorkerJs = fs.readFileSync(path.join(__dirname, './node_modules/export-nehuba/dist/min/chunk_worker.bundle.js'), 'utf-8')
+  } catch (e) {
+    tracer.log(`[experimental] reading export-nehuba modules failed\n`, e)
+  }
+  app.get('/export_nehuba.js', (_, res) => {
+    console.log('getting export nehuba')
+    if (!mainJs) return res.status(404).end()
+    res.setHeader('Content-Type', 'text/javascript')
+    res.status(200).send(mainJs)
+  })
+
+  app.get('/chunk_worker.bundle.js', (_, res) => {
+    if (!chunkWorkerJs) return res.status(404).end()
+    res.setHeader('Content-Type', 'text/javascript')
+    res.status(200).send(chunkWorkerJs)
+  })
+}
+
 //========================================================================================
 // Passport: OAuth2 authentication
 //========================================================================================

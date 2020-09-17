@@ -15,6 +15,7 @@ import {AtlasMakerWS} from './atlasmaker-ws.js';
 import Config from './../../../cfg.json';
 import toolsFull from './html/toolsFull.html';
 import toolsLight from './html/toolsLight.html';
+import { shimNehuba } from './experimental/nehuba-shim'
 
 window.$ = $;
 
@@ -28,6 +29,7 @@ var me = {
   //========================================================================================
   debug: 1, // integer, debug level. None = 0
   version: 1, // version of the configuration file (slice number, plane, etc). Default=1
+  canvasId: 'canvas',
 
   // connection
   hostname: Config.hostname, // string, host url
@@ -252,6 +254,10 @@ var me = {
     $.extend(me, AtlasMakerPaint);
     $.extend(me, AtlasMakerUI);
     $.extend(me, AtlasMakerWS);
+
+    if (Config && Config.experimental && Config.experimental.useNehuba) {
+      shimNehuba(me)
+    }
   },
   _createOffscreenCanvases: function () {
     // Create offscreen canvases for mri and atlas
